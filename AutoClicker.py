@@ -27,7 +27,6 @@ class POINT(Structure):
 g_clicksPerSec = 20.0
 g_clickFreq = 1.0 / g_clicksPerSec 
 g_keyPressed = False
-g_clickPos = POINT()
 
 ###############################################################################
 ###############################################################################
@@ -51,27 +50,27 @@ def mouseDown():
     return True if ( shortRes & 0x8000 ) else False
 
 def startAutoClicker():
-    global g_clickPos
     global g_keyPressed 
 
     print "AutoClicker Start"
     g_keyPressed = False;
-    windll.user32.GetCursorPos(byref(g_clickPos))
+    clickPos = POINT()
+    windll.user32.GetCursorPos(byref(clickPos))
     time.sleep(0.5) # Avoid to stop directly
 
     while True:
         if g_keyPressed:
             print "AutoClicker Stop"
             return
-        prevPos = POINT()
 
+        activeWindow = windll.user32.GetForegroundWindow ()
+        prevPos = POINT()
+        windll.user32.GetCursorPos(byref(prevPos))
+        
         if mouseDown():
             continue
 
-        activeWindow = windll.user32.GetForegroundWindow ()
-        windll.user32.GetCursorPos(byref(prevPos))
-
-        click(g_clickPos.x, g_clickPos.y)
+        click(clickPos.x, clickPos.y)
 
         windll.user32.SetForegroundWindow(activeWindow)
         windll.user32.SetCursorPos(prevPos.x, prevPos.y)
